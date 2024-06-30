@@ -1,16 +1,17 @@
 # Use the official Ruby image as a parent image
-FROM ruby:3.3.2
+FROM ruby:3.3.3
 
 # Set environment variables
 ENV APP_ROOT /workspace
 
 # Install dependencies
 RUN apt-get update && \
-    apt-get install -y nodejs \
+    apt-get install -y --no-install-recommends \
+    nodejs \
     vim \
-    default-mysql-client \
-    --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/*
+    default-mysql-client && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/.deb /var/cache/apt/archives/partial/.deb /var/cache/apt/*.bin || true
 
 # Set the working directory to /tmp for caching the bundle install
 WORKDIR /tmp
