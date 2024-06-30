@@ -4,6 +4,7 @@ Chat system allow creating new applications where each application will have tok
 - Ruby 3.3.3
 - Database: Mysql 
 - Caching: Redis
+- Jobs: Sidekiq
 - Containerization: Docker
 
 ## Setup
