@@ -3,6 +3,7 @@ FROM ruby:3.3.3
 
 # Set environment variables
 ENV APP_ROOT /workspace
+ENV LANG C.UTF-8
 
 # Install dependencies
 RUN apt-get update && \
@@ -17,8 +18,7 @@ RUN apt-get update && \
 WORKDIR /tmp
 
 # Add the Gemfile and Gemfile.lock to the /tmp directory
-ADD Gemfile Gemfile
-ADD Gemfile.lock Gemfile.lock
+COPY Gemfile Gemfile.lock ./
 
 # Run bundle install to install gems
 RUN bundle install

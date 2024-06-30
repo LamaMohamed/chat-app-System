@@ -47,9 +47,6 @@ group :development do
   gem "spring-watcher-listen" , "~> 2.0.0"
 end
 
-gem 'sinatra'
-gem 'activerecord'
-gem 'sinatra-activerecord'
 gem 'securerandom'
 gem 'redis'
 gem 'redis-namespace'
