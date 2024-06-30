@@ -1,0 +1,5 @@
+:schedule:
+  update_message_counts:
+    cron: "0 * * * *" # Runs every hour
+    class: "ScheduleUpdateMessageCount"
+    queue: default
