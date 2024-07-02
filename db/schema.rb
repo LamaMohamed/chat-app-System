@@ -21,7 +21,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_01_235235) do
   end
 
   create_table "chats", charset: "utf8mb4", force: :cascade do |t|
-    t.bigint "app_id"
+    t.bigint "app_token"
     t.text "content"
     t.bigint "chat_number"
     t.integer 'messages_count'
@@ -31,6 +31,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_01_235235) do
   end
 
   create_table "messages", charset: "utf8mb4", force: :cascade do |t|
+    t.string 'app_token'
     t.bigint "message_number"
     t.bigint "chat_id"
     t.text "content"
