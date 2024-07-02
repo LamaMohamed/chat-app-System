@@ -7,8 +7,8 @@ class MessageService
       Rails.logger.info "Cache hit for messages with chat number: #{chat_number}"
       return JSON.parse(cached_response), :ok
     end
-
-    chat = find_chat_by_token_and_number(app_token, chat_number)
+    application = App.find_by_token(app_token)
+    chat = Chat.find_by(app_id: application.id, chat_number: chat_number)
     return chat unless chat.is_a?(Chat)
 
     messages = chat.messages.as_json(only: [:message_number, :content, :created_at, :updated_at])
@@ -23,10 +23,10 @@ class MessageService
     chat = find_chat_by_token_and_number(app_token, chat_number)
     return chat unless chat.is_a?(Chat)
 
-    new_message_number = get_new_message_number(app_token,chat_number)
-    increment_messages_count params(app_token,chat_number)
+    new_message_number = get_new_message_number(app_token, chat_number)
+    increment_messages_count(app_token, chat_number)
     message = chat.messages.new(message_number: new_message_number, content: content)
-    UpdateMessageCount.perform_async(app_token,chat_number)
+    UpdateMessageCount.perform_async(app_token, chat_number)
 
     if message.save
       Rails.logger.info "Message created with message number: #{new_message_number} for chat number: #{chat_number}"
@@ -38,7 +38,7 @@ class MessageService
   end
 
   def self.get_message(app_token, chat_number, message_number)
-    cache_key = "messages_get_message_#{app_token}_#{chat_number}_#{message_number}"
+    cache_key = "messages_get_message_#{app_token}#{chat_number}#{message_number}"
     cached_response = $redis.get(cache_key)
 
     if cached_response
@@ -61,9 +61,9 @@ class MessageService
 
     if message.destroy
       clear_cache(app_token, chat_number, message_number)
-      decrement_messages_count(app_token,chat_number)
+      decrement_messages_count(app_token, chat_number)
       Rails.logger.info "Successfully deleted message number: #{message_number} for chat number: #{chat_number}"
-      UpdateMessageCount.perform_async(app_token,chat_number)
+      UpdateMessageCount.perform_async(app_token, chat_number)
       return { message: "Successful: Deleted message number #{message_number}" }, :ok
     else
       Rails.logger.error "Failed to delete message with valid parameters for message number: #{message_number}, chat number: #{chat_number}"
@@ -87,7 +87,7 @@ class MessageService
     end
   end
 
-  def search(app_token, chat_number, query)
+  def self.search(app_token, chat_number, query)
     application = App.find_by(token: app_token)
     unless application
       Rails.logger.error "Invalid token: #{app_token}"
@@ -110,8 +110,8 @@ class MessageService
         return_results[:results] << { message_number: message_number, content: content }
       end
     end
-  
-    return_results
+    
+    return return_results
   end
 
   private
@@ -136,26 +136,26 @@ class MessageService
     message
   end
 
-  def get_new_message_number(app_token, chat_number)
+  def self.get_new_message_number(app_token, chat_number)
     $redis.incr("message_number_counter$#{app_token + ':' + chat_number.to_s}")
   end
 
-  def increment_messages_count(app_token, chat_number)
+  def self.increment_messages_count(app_token, chat_number)
     $redis.incr("messages_count$#{app_token + ':' + chat_number.to_s}")
   end
 
-  def decrement_messages_count(app_token, chat_number)
+  def self.decrement_messages_count(app_token, chat_number)
     $redis.decr("messages_count$#{app_token + ':' + chat_number.to_s}")
-  
-    
-  def get_messages_count(app_token, chat_number)
-      $redis.get("messages_count$#{app_token + ':' + chat_number.to_s}")
+  end
+
+  def self.get_messages_count(app_token, chat_number)
+    $redis.get("messages_count$#{app_token + ':' + chat_number.to_s}")
   end
 
   def self.clear_cache(app_token, chat_number, message_number)
     delete_cache_keys("messages_get_messages_#{app_token}_#{chat_number}")
-    delete_cache_keys("messages_get_message_#{app_token}_#{chat_number}_#{message_number}")
-    delete_cache_keys("search_#{app_token}_*#{chat_number}*")
+    delete_cache_keys("messages_get_message_#{app_token}#{chat_number}#{message_number}")
+    delete_cache_keys("search_#{app_token}_#{chat_number}")
   end
 
   def self.delete_cache_keys(pattern)
