@@ -23,8 +23,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_01_235235) do
   create_table "chats", charset: "utf8mb4", force: :cascade do |t|
     t.bigint "app_id"
     t.text "content"
+    t.integer 'messages_count'
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ['app_id'], name: 'index_chats_on_application_id'
   end
 
   create_table "messages", charset: "utf8mb4", force: :cascade do |t|
@@ -37,5 +39,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_01_235235) do
     t.index ["message_number"], name: "index_messages_on_message_number"
   end
 
+  add_foreign_key 'chats', 'apps'
   add_foreign_key "messages", "chats", on_delete: :cascade
 end

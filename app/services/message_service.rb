@@ -23,11 +23,12 @@ class MessageService
     chat = find_chat_by_token_and_number(app_token, chat_number)
     return chat unless chat.is_a?(Chat)
 
-    new_message_number = chat.messages.maximum('message_number').to_i + 1
+    new_message_number = get_new_message_number(app_token,chat_number)
+    increment_messages_count params(app_token,chat_number)
     message = chat.messages.new(message_number: new_message_number, content: content)
+    UpdateMessageCount.perform_async(app_token,chat_number)
 
     if message.save
-      clear_cache(app_token, chat_number, new_message_number)
       Rails.logger.info "Message created with message number: #{new_message_number} for chat number: #{chat_number}"
       return message.as_json(only: [:message_number, :content, :created_at, :updated_at]), :created
     else
@@ -60,7 +61,9 @@ class MessageService
 
     if message.destroy
       clear_cache(app_token, chat_number, message_number)
+      decrement_messages_count(app_token,chat_number)
       Rails.logger.info "Successfully deleted message number: #{message_number} for chat number: #{chat_number}"
+      UpdateMessageCount.perform_async(app_token,chat_number)
       return { message: "Successful: Deleted message number #{message_number}" }, :ok
     else
       Rails.logger.error "Failed to delete message with valid parameters for message number: #{message_number}, chat number: #{chat_number}"
@@ -104,6 +107,22 @@ class MessageService
     return { error: "Invalid message number" }, :not_found unless message
 
     message
+  end
+
+  def get_new_message_number(app_token, chat_number)
+    $redis.incr("message_number_counter$#{app_token + ':' + chat_number.to_s}")
+  end
+
+  def increment_messages_count(app_token, chat_number)
+    $redis.incr("messages_count$#{app_token + ':' + chat_number.to_s}")
+  end
+
+  def decrement_messages_count(app_token, chat_number)
+    $redis.decr("messages_count$#{app_token + ':' + chat_number.to_s}")
+  
+    
+  def get_messages_count(app_token, chat_number)
+      $redis.get("messages_count$#{app_token + ':' + chat_number.to_s}")
   end
 
   def self.clear_cache(app_token, chat_number, message_number)

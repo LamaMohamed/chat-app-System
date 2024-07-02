@@ -1,11 +1,11 @@
 class UpdateMessageCount
   include Sidekiq::Worker
 
-  def perform(chat_id)
-    chat = Chat.find(chat_id)
-    new_messages_count = chat.messages.where('created_at > ?', 1.hour.ago).count
+  def perform(app_token,chat_number)
+    chat = Chat.find_by_chat_number(chat_number)
+    new_messages_count = MessageService.get_messages_count(app_token, chat_number)
     chat.update(messages_count: new_messages_count)
   rescue ActiveRecord::RecordNotFound => e
-    logger.error "Chat with ID #{chat_id} not found: #{e.message}"
+    logger.error "Chat with number #{chat_number} not found: #{e.message}"
   end
 end
