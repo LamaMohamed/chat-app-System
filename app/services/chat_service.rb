@@ -54,8 +54,8 @@ class ChatService
       return { error: "Unsuccessful: Invalid token #{app_token}" }, :not_found
     end
 
-    new_chat_number = get_new_chat_number params(app_token)
-    increment_chats_count params(app_token)
+    new_chat_number = get_new_chat_number(app_token)
+    increment_chats_count=(app_token)
     chat = Chat.new({ app_id: application.id, chat_number: new_chat_number, messages_count: 0 }) 
     UpdateChatCount.perform_async(app_token)
     if chat.save
@@ -94,19 +94,19 @@ class ChatService
     end
   end
 
-  def get_new_chat_number(app_token)
+  def self.get_new_chat_number(app_token)
     $redis.incr("chat_number_counter$#{app_token}")
   end
 
-  def increment_chats_count(app_token)
+  def self.increment_chats_count(app_token)
     $redis.incr("chats_count$#{app_token}")
   end
 
-  def decrement_chats_count(app_token)
+  def self.decrement_chats_count(app_token)
     $redis.decr("chats_count$#{app_token}")
   end
 
-  def get_chats_count(app_token)
+  def self.get_chats_count(app_token)
     $redis.get("chats_count$#{app_token}")
 end
 
