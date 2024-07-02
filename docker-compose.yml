@@ -53,6 +53,7 @@ services:
 
   app:
     build: .
+    command: bundle exec rails db:migrate:reset && rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0'
     environment:
       RAILS_ENV: development
       ELASTICSEARCH_URL: http://elasticsearch:9200

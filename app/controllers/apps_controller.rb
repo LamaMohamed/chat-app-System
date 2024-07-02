@@ -1,5 +1,4 @@
 class AppsController < ApplicationController
-  before_action :set_app, only: [:show, :update, :destroy]
 
   def get_token
     result, status = AppService.create_token(params[:name])
@@ -16,6 +15,11 @@ class AppsController < ApplicationController
     render json: result, status: status
   end
 
+  def get_all
+    result, status = AppService.get_all
+    render json: result, status: status
+  end  
+
   private
 
   def set_app
@@ -26,6 +30,6 @@ class AppsController < ApplicationController
   end
 
   def app_params
-    params.require(:app).permit(:name, :token)
+    params.require(:app).permit(:name, :app_token)
   end
 end

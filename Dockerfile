@@ -34,4 +34,4 @@ COPY . $APP_ROOT
 EXPOSE 3000
 
 # Define the command to run the application
-CMD ["bash", "-c", "rails db:migrate:reset && rm -f tmp/pids/server.pid && rails s -b '0.0.0.0'"]
+#CMD ["bash", "-c", "rails db:migrate:reset && rm -f tmp/pids/server.pid && rails s -b '0.0.0.0'"]

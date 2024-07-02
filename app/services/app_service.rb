@@ -45,4 +45,9 @@ class AppService
     Rails.logger.info "Cache miss for chats count. Cached response for token: #{app_token}"
     return { chats_count: to_cache }, :ok
   end
+
+  def self.get_all
+    all_apps = App.all
+    return all_apps.as_json, :ok
+  end
 end

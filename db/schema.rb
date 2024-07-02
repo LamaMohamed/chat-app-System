@@ -10,36 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_6_30_002941) do
-    create_table "apps", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-        t.string "name"
-        t.string "token"
-        t.integer "chats_count", default: 0
-        t.datetime "created_at", null: false
-        t.datetime "updated_at", null: false
-        t.index ["token"], name: "index_apps_on_token"
-      end
-    
-      create_table "chats", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-        t.integer "chat_number"
-        t.bigint "app_id"
-        t.integer "messages_count", default: 0
-        t.datetime "created_at", null: false
-        t.datetime "updated_at", null: false
-        t.index ["app_id"], name: "fk_rails_de65013ee8"
-        t.index ["chat_number"], name: "index_chats_on_chat_number"
-      end
-    
-      create_table "messages", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-        t.bigint "chat_id"
-        t.integer "message_number"
-        t.text "content"
-        t.datetime "created_at", null: false
-        t.datetime "updated_at", null: false
-        t.index ["chat_id"], name: "fk_rails_0f670de7ba"
-        t.index ["message_number"], name: "index_messages_on_message_number"
-      end
-    
-      add_foreign_key "chats", "apps", on_delete: :cascade
-      add_foreign_key "messages", "chats", on_delete: :cascade
+ActiveRecord::Schema[7.1].define(version: 2024_07_01_235235) do
+  create_table "apps", charset: "utf8mb4", force: :cascade do |t|
+    t.string "name"
+    t.string "token"
+    t.integer "chats_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["token"], name: "index_apps_on_token"
+  end
+
+  create_table "chats", charset: "utf8mb4", force: :cascade do |t|
+    t.bigint "app_id"
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "messages", charset: "utf8mb4", force: :cascade do |t|
+    t.bigint "message_number"
+    t.bigint "chat_id"
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_id"], name: "fk_rails_0f670de7ba"
+    t.index ["message_number"], name: "index_messages_on_message_number"
+  end
+
+  add_foreign_key "messages", "chats", on_delete: :cascade
 end

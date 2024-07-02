@@ -19,6 +19,7 @@ Chat system allow creating new applications where each application will have tok
 ### Applications routes
 
 - post '/applications', to: 'apps#get_token'
+- get '/applications', to: 'get_all'
 - get '/applications/:app_token/chats/count'
 - delete '/applications/:app_token'
 

@@ -1,5 +1,9 @@
 :schedule:
   update_message_counts:
     cron: "0 * * * *" # Runs every hour
-    class: "ScheduleUpdateMessageCount"
+    class: "UpdateMessageCount"
     queue: default
+  update_chat_counts:
+    cron: "0 * * * *" # Runs every hour
+    class: "UpdateChatCount"
+    queue: default   

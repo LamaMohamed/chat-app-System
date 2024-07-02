@@ -54,13 +54,13 @@ class ChatService
       return { error: "Unsuccessful: Invalid token #{app_token}" }, :not_found
     end
 
-    new_chat_number = application.chats.maximum(:chat_number).to_i + 1
-    chat = Chat.new(chat_number: new_chat_number, app_id: application.id)
+    new_chat_number = get_new_chat_number params[:token]
+    increment_chats_count params[:token]
+    chat = Chat.new({ app_token: params[:token], chat_number: new_chat_number, messages_count: 0 }) 
+
     if chat.save
-      delete_cache_keys("apps_get_chats_count_#{app_token}")
-      delete_cache_keys("chats_get_chats_#{app_token}")
       Rails.logger.info "Chat created with chat number: #{new_chat_number} for token: #{app_token}"
-      return chat.as_json(only: [:chat_number, :created_at]), :ok
+      return chat.as_json(only: [:new_chat_number, :created_at]), :ok
     else
       Rails.logger.error "Failed to create chat: #{chat.errors.full_messages.join(', ')}"
       return chat.errors, :unprocessable_entity
@@ -74,7 +74,7 @@ class ChatService
       return { error: "Unsuccessful: Invalid token #{app_token}" }, :not_found
     end
 
-    chat = Chat.find_by(app_id: application.id, chat_number: chat_number)
+    chat = Chat.find_by(app_token: application.token, chat_number: chat_number)
     unless chat
       Rails.logger.error "Invalid chat number: #{chat_number}"
       return { error: "Unsuccessful: Invalid chat number #{chat_number}" }, :not_found
@@ -90,6 +90,18 @@ class ChatService
       Rails.logger.error "Failed to delete chat with valid parameters for chat number: #{chat_number}"
       return { error: "Unsuccessful: Valid parameters but could not delete" }, :unprocessable_entity
     end
+  end
+
+  def get_new_chat_number(app_token)
+    $redis.incr("chat_number_counter$#{app_token}")
+  end
+
+  def increment_chats_count(app_token)
+    $redis.incr("chats_count$#{app_token}")
+  end
+
+  def decrement_chats_count(app_token)
+    $redis.decr("chats_count$#{app_token}")
   end
 
   private

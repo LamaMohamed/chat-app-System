@@ -1,7 +1,8 @@
 Rails.application.routes.draw do
 
   # Applications routes
-  post '/applications', to: 'apps#get_token', as: 'create_application'
+  post '/applications/:name', to: 'apps#get_token', as: 'create_application'
+  get '/applications', to: 'apps#get_all', as: 'get_all_applications'
   get '/applications/:app_token/chats/count', to: 'apps#get_chats_count', as: 'chats_count'
   delete '/applications/:app_token', to: 'apps#delete_app', as: 'delete_application'
 

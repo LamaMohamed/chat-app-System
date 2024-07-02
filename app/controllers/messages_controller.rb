@@ -1,6 +1,4 @@
 class MessagesController < ApplicationController
-  before_action :set_application_and_chat, only: [:get_messages, :post_message, :get_message, :delete_message, :update_message]
-  before_action :set_message, only: [:get_message, :delete_message, :update_message]
 
   def get_messages
     result, status = MessageService.get_messages(params[:app_token], params[:chat_number])

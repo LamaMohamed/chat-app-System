@@ -1,5 +1,4 @@
 class ChatsController < ApplicationController
-  before_action :set_chat, only: [:show, :update, :destroy]
 
   def get_chats
     result, status = ChatService.get_chats(params[:app_token])

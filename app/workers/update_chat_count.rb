@@ -1,4 +1,4 @@
-class ScheduleUpdateMessageCount
+class UpdateChatCount
     include Sidekiq::Worker
   
     def perform
