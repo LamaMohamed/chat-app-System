@@ -54,6 +54,3 @@ gem 'sidekiq'
 gem 'sidekiq-scheduler'
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
-gem 'elasticsearch'
-gem 'hairtrigger'
-gem 'rspec-rails', group: [:development, :test]
