@@ -10,9 +10,7 @@ Chat system allow creating new applications where each application will have tok
 ## Setup
 
 1. Clone the repository.
-2. Run `bundle install` to install dependencies.
-3. Run `rails db:create db:migrate` to set up the database.
-4. Run `docker-compose up -d --build` to start the services.
+2. Run `docker-compose up -d --build` to start the services.
 
 ## Endpoints
 
