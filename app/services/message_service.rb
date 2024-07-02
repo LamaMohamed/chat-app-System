@@ -87,6 +87,33 @@ class MessageService
     end
   end
 
+  def search(app_token, chat_number, query)
+    application = App.find_by(token: app_token)
+    unless application
+      Rails.logger.error "Invalid token: #{app_token}"
+      return { error: "Unsuccessful: Invalid token #{app_token}" }, :not_found
+    end
+    
+    chat = Chat.find_by(app_id: application.id, chat_number: chat_number)
+    unless chat
+      Rails.logger.error "Invalid chat number: #{chat_number}"
+      return { error: "Unsuccessful: Invalid chat number #{chat_number}" }, :not_found
+    end
+  
+    search_results = Message.search(query)
+    return_results = { results: [] }
+  
+    search_results.each do |result_item|
+      if chat.id == result_item['_source']['chat_id']
+        message_number = result_item['_source']['message_number']
+        content = result_item['_source']['content']
+        return_results[:results] << { message_number: message_number, content: content }
+      end
+    end
+  
+    return_results
+  end
+
   private
 
   def self.find_chat_by_token_and_number(app_token, chat_number)
